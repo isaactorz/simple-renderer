@@ -1,0 +1,16 @@
+OBJS = HelloGLSL.cpp obj_loader.cpp Camera.cpp
+
+CC = g++
+
+INCLUDE_PATHS = -I/usr/local/include -I/opt/X11/include -I/opt/local/include/
+
+LIBRARY_PATHS = -L/usr/local/lib -I/opt/X11/lib -L/opt/local/lib
+
+COMPILER_FLAGS = -std=c++11 -w -Werror
+
+LINKER_FLAGS = -framework OpenGL -lGLUT -lGLEW
+
+OBJ_NAME = exec
+
+all : $(OBJS)
+	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)

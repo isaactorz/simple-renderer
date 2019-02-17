@@ -1,0 +1,58 @@
+#version 330 core
+
+layout(location = 0) in vec3 vert_position;
+layout(location = 1) in vec3 vert_normal;
+
+out vec4 myColor;
+
+uniform mat4 MVP;
+uniform mat4 N;
+uniform vec4 Kd;
+uniform vec4 Ld;
+uniform vec4 Ks;
+uniform vec4 Ls;
+uniform vec4 Ka;
+uniform vec4 La;
+uniform vec4 l_dir;
+uniform vec4 Ga;
+uniform float shininess;
+
+vec4 ambient()
+{
+   vec4 ambient = vec4(0.0);
+   ambient = Ka * La;
+   ambient += (Ga * Ka);
+   return ambient;
+}
+
+vec4 diffuse(vec3 normal)
+{
+   vec3 l_eye = normalize(N * l_dir).xyz;
+   vec3 l = normalize(l_eye - vec3(N * vec4(vert_position, 1)));
+   return Kd * Ld * max(dot(normal,l), 0.0);
+}
+
+vec4 specular(vec3 normal)
+{
+   vec3 pos = vec3(N * vec4(vert_position, 1)); 
+   vec3 eye = normalize(-pos);
+   vec3 l_eye = normalize(N * l_dir).xyz;
+   vec3 h = normalize(l_eye + eye);
+   float hv = max(dot(h, normal), 0.0);
+   return Ks * Ls * pow(hv, shininess);
+}
+
+void main(){
+
+	gl_Position =  MVP * vec4(vert_position,1);
+	
+	vec3 norm_cameraspace = normalize(N * vec4(vert_normal, 0.0)).xyz; 
+
+        vec4 diffuse = diffuse(norm_cameraspace);
+        vec4 ambient = ambient() ;
+        vec4 spec = specular(norm_cameraspace);
+
+        float distance = length(l_dir.xyz - vert_position);
+
+        myColor = diffuse/(distance*distance) + spec/(distance*distance) + ambient;
+}
